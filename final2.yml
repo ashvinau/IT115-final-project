@@ -1,0 +1,49 @@
+---
+- name: Final II Electric Boogaloo The Website
+  hosts: final2
+  become: true
+  gather_facts: true
+  
+  tasks:
+  - name: Update OS and packages
+    apt:
+     update_cache: yes
+     upgrade: yes
+     force_apt_get: yes
+     
+  - name: install apache
+    apt: 
+     name: apache2
+     state: latest  
+  
+  - name: start apache
+    service:
+     name: apache2
+     state: restarted
+  
+  - name: remove default apache index.html
+    file:
+      path: /var/www/html/index.html
+      state: absent 
+
+  - name: create admin user
+    user: 
+     name: admin
+     create_home: yes
+     group: root      
+      
+  - name: copy script to clone repo to server
+    copy:
+      src: ./clonerepo.sh
+      dest: /home/admin/clonerepo.sh
+      owner: root
+      mode: 777
+      
+  - name: run script to clone repo
+    shell: ./clonerepo.sh
+    args:
+      chdir: /home/admin/
+      executable: /bin/bash
+      
+  
+      
